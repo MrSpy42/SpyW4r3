@@ -1,0 +1,15 @@
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\bin\Debug\netcoreapp3.1\SpyW4r3.exe
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\bin\Debug\netcoreapp3.1\SpyW4r3.deps.json
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\bin\Debug\netcoreapp3.1\SpyW4r3.runtimeconfig.json
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\bin\Debug\netcoreapp3.1\SpyW4r3.runtimeconfig.dev.json
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\bin\Debug\netcoreapp3.1\SpyW4r3.dll
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\bin\Debug\netcoreapp3.1\SpyW4r3.pdb
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.csprojAssemblyReference.cache
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.FrmMain.resources
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.csproj.GenerateResource.cache
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.AssemblyInfoInputs.cache
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.AssemblyInfo.cs
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.csproj.CoreCompileInputs.cache
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.dll
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.pdb
+C:\Users\nikif\source\repos\SpyW4r3\SpyW4r3\obj\Debug\netcoreapp3.1\SpyW4r3.genruntimeconfig.cache
