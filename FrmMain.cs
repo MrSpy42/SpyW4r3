@@ -4,15 +4,12 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Net.Sockets;
 using System.Net;
-using System.Security.Cryptography;
-using System.IO;
 
 namespace SpyW4r3
 {
     public partial class FrmMain : Form
     {
         static int port;
-        static IPAddress ip;
         static int portS = -1;
         static IPAddress ipS;
         static messageClient server;
@@ -47,10 +44,9 @@ namespace SpyW4r3
         private void connectButton_Click(object sender, EventArgs e)
         {
             mainTextBox.AppendText("Opening listener...");
-            try { 
-                ip = IPAddress.Parse("127.0.0.1");
+            try {
                 port = Int32.Parse(portTextBox.Text);
-                server = new messageClient(ip, port);
+                server = new messageClient(port);
                 sendThread = new Thread(sendHandler);
                 sendThread.Start();
                 t = new Thread(handler);
@@ -86,9 +82,8 @@ namespace SpyW4r3
                         StringBuilder str = new StringBuilder();
                         StringBuilder str2 = new StringBuilder();
                         str2.Append(Encoding.ASCII.GetString(d));
-                        str.Append(client.Client.LocalEndPoint.ToString());
+                        str.Append(client.Client.RemoteEndPoint.ToString());
                         server.encryptionKey = server.tempPort;
-                        server.keyPort = server.tempPort;
                         string[] Ip = str.ToString().Split(":");
                         string[] Port = str2.ToString().Split(",");
                         ipS = IPAddress.Parse(Ip[0]);
@@ -105,7 +100,7 @@ namespace SpyW4r3
                         this.Invoke(mi);
                     }
 
-                    d = Encoding.ASCII.GetBytes(server.DecryptString(d, server.encryptionKey, server.IV));
+                    d = Encoding.ASCII.GetBytes(Encryptor.DecryptString(d, server.encryptionKey, server.IV));
 
                     mi = delegate () {
                         this.mainTextBox.AppendText(Encoding.ASCII.GetString(d));
@@ -125,13 +120,14 @@ namespace SpyW4r3
         {
             while(sendBool)
             {
+                byte[] msg;
                 if(!(server == null))
                 {
                     if (server.sendQueue != null)
                     {
                         TcpClient client = new TcpClient(ipS.ToString(), portS);
                         NetworkStream str = client.GetStream();
-                        byte[] msg = { 0xFE };
+                        
                         if (Encoding.ASCII.GetString(server.sendQueue).Contains("!requestConnect"))
                         {
                             msg = server.sendQueue;
@@ -157,7 +153,7 @@ namespace SpyW4r3
             username = this.usernameBox.Text;
 
             String s = username + " : " + this.sendBox.Text;
-            server.send(server.EncryptString(s, server.encryptionKey, server.IV));
+            server.send(Encryptor.EncryptString(s, server.encryptionKey, server.IV));
         }
 
         //REQUEST CONNECT WITH ALREADY LISTENING CLIENT
@@ -175,125 +171,6 @@ namespace SpyW4r3
 
             server.send(Encoding.ASCII.GetBytes("!requestConnect," + port.ToString()));
             Thread.Sleep(50);
-        }
-    }
-
-    //
-    // MESSAGE CLIENT CLASS
-    //
-    public class messageClient
-    {
-        public byte[] sendQueue = null;
-        public TcpListener listener;
-        public byte[] keyPort = new byte[16];
-        public readonly byte[] tempPort = new byte[16];
-        public byte[] encryptionKey = new byte[16];
-        public byte[] IV = Encoding.ASCII.GetBytes("spywarebestware1");
-        
-        public messageClient(IPAddress ip,int port)
-        {
-            listener = new TcpListener(ip, port);
-            listener.Start();
-            tempPort = Encoding.ASCII.GetBytes(port.ToString() + "000000000000");
-        }
-        public byte[] receive(NetworkStream stream)
-        {
-            byte[] bytes = new Byte[256];
-            stream.Read(bytes, 0, bytes.Length);
-            
-            return bytes;
-        }
-
-        public void send(byte[] s)
-        {
-            sendQueue = s;
-        }
-
-        public byte[] EncryptString(string plainText, byte[] Key, byte[] IV)
-        {
-            // Check arguments.
-            if (plainText == null || plainText.Length <= 0)
-                throw new ArgumentNullException("plainText");
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
-            byte[] encrypted;
-
-            // Create an Aes object
-            // with the specified key and IV.
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
-                aesAlg.Padding = PaddingMode.Zeros;
-                
-
-                // Create an encryptor to perform the stream transform.
-                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for encryption.
-                using (MemoryStream msEncrypt = new MemoryStream())
-                {
-                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
-                    {
-                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
-                        {
-                            //Write all data to the stream.
-                            swEncrypt.Write(plainText);
-                        }
-                        encrypted = msEncrypt.ToArray();
-                    }
-                }
-            }
-
-            // Return the encrypted bytes from the memory stream.
-            return encrypted;
-        }
-
-        public string DecryptString(byte[] cipherText, byte[] Key, byte[] IV)
-        {
-            // Check arguments.
-            if (cipherText == null || cipherText.Length <= 0)
-                throw new ArgumentNullException("cipherText");
-            if (Key == null || Key.Length <= 0)
-                throw new ArgumentNullException("Key");
-            if (IV == null || IV.Length <= 0)
-                throw new ArgumentNullException("IV");
-
-            // Declare the string used to hold
-            // the decrypted text.
-            string plaintext = null;
-
-            // Create an Aes object
-            // with the specified key and IV.
-            using (Aes aesAlg = Aes.Create())
-            {
-                aesAlg.Key = Key;
-                aesAlg.IV = IV;
-                aesAlg.Padding = PaddingMode.Zeros;
-
-                // Create a decryptor to perform the stream transform.
-                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
-
-                // Create the streams used for decryption.
-                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
-                {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                    {
-                        
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                        {
-                            
-                            // Read the decrypted bytes from the decrypting stream
-                            // and place them in a string. 
-                            plaintext = srDecrypt.ReadLine();
-                        }
-                    }
-                }
-            }
-
-            return plaintext;
         }
     }
 }
